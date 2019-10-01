@@ -6,6 +6,7 @@ import axios from "axios";
 class App extends React.Component {
   state = {
     user: {},
+    userText: "Robdowski",
     userFollowers: []
   };
 
@@ -31,9 +32,42 @@ class App extends React.Component {
     })
   }
 
+  handleChanges = e => {
+    this.setState({
+      userText: e.target.value
+    })
+  }
+
+  fetchUser = e => {
+    e.preventDefault()
+    axios.get(`https://api.github.com/users/${this.state.userText}`)
+    .then(res => {
+      this.setState({
+        user: res.data
+      })
+      console.log(res)
+    })
+    .catch(err =>{
+      console.log(err)
+    })
+
+    axios.get(`https://api.github.com/users/${this.state.userText}/followers`)
+    .then(res => {
+      console.log(res)
+      this.setState({
+        userFollowers: res.data
+      })
+      console.log(this.state.userFollowers)
+    })
+  }
+
   render() {
     return (
       <div className="App">
+        <div className='get-user'>
+          <input type='text' value={this.state.userText} onChange={this.handleChanges} />
+          <button onClick={this.fetchUser}>Lookup User</button>
+        </div>
         <div className="user-card">
           <h2>{this.state.user.name}</h2>
           <p>Bio: {this.state.user.bio}</p>
